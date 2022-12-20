@@ -5,9 +5,17 @@ import "../../../src/index";
 
 const config: HardhatUserConfig = {
   solidity: "0.7.3",
-  defaultNetwork: "hardhat",
-  paths: {
-    newPath: "asd",
+  defaultNetwork: "local-tableland",
+  tables: {
+    gen: {
+      onCreateTables: true,
+      path: "./gen",
+    },
+    definitions: {
+      people: {
+        schema: "id integer, name text, age integer",
+      },
+    },
   },
 };
 

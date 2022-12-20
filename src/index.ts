@@ -1,49 +1,105 @@
-import { extendConfig, extendEnvironment } from "hardhat/config";
-import { lazyObject } from "hardhat/plugins";
+import { ChainName, connect } from "@tableland/sdk";
+import { Config, LocalTableland } from "@tableland/local";
+import { extendConfig, extendEnvironment, task } from "hardhat/config";
+import { lazyObject, HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig, HardhatUserConfig } from "hardhat/types";
+import "@nomicfoundation/hardhat-toolbox";
 import path from "path";
-
-import { ExampleHardhatRuntimeEnvironmentField } from "./ExampleHardhatRuntimeEnvironmentField";
-// This import is needed to let the TypeScript compiler know that it should include your type
-// extensions in your npm package's types file.
+import { init, TablesConfig } from "./tables";
 import "./type-extensions";
 
 extendConfig(
   (config: HardhatConfig, userConfig: Readonly<HardhatUserConfig>) => {
-    // We apply our default config here. Any other kind of config resolution
-    // or normalization should be placed here.
-    //
-    // `config` is the resolved config, which will be used during runtime and
-    // you should modify.
-    // `userConfig` is the config as provided by the user. You should not modify
-    // it.
-    //
-    // If you extended the `HardhatConfig` type, you need to make sure that
-    // executing this function ensures that the `config` object is in a valid
-    // state for its type, including its extensions. For example, you may
-    // need to apply a default value, like in this example.
-    const userPath = userConfig.paths?.newPath;
-
-    let newPath: string;
-    if (userPath === undefined) {
-      newPath = path.join(config.paths.root, "newPath");
+    let tablesConfig: TablesConfig;
+    const userTablesConfig = userConfig.tables;
+    if (userTablesConfig == undefined) {
+      tablesConfig = {
+        gen: {
+          onCreateTables: true,
+          path: path.normalize(path.join(config.paths.root, "gen")),
+        },
+        definitions: {},
+      };
     } else {
-      if (path.isAbsolute(userPath)) {
-        newPath = userPath;
-      } else {
-        // We resolve relative paths starting from the project's root.
-        // Please keep this convention to avoid confusion.
-        newPath = path.normalize(path.join(config.paths.root, userPath));
-      }
+      tablesConfig = userTablesConfig;
     }
-
-    config.paths.newPath = newPath;
+    config.tables = tablesConfig;
+    config.localTableland = userConfig.localTableland;
+    config.networks["local-tableland"] = config.networks.localhost;
   }
 );
 
 extendEnvironment((hre) => {
-  // We add a field to the Hardhat Runtime Environment here.
-  // We use lazyObject to avoid initializing things until they are actually
-  // needed.
-  hre.example = lazyObject(() => new ExampleHardhatRuntimeEnvironmentField());
+  hre.tableland = lazyObject(() => {
+    return {
+      processTables: async (config: TablesConfig = hre.config.tables) => {
+        if (
+          hre.network.name === "hardhat" ||
+          hre.network.name === "localhost"
+        ) {
+          throw new HardhatPluginError(
+            "@tableland/hardhat",
+            "Can't integrate Tableland into localhost or hardhat network. Use network local-tableland or any real network instead."
+          );
+        }
+        const [signer] = await hre.ethers.getSigners();
+        const tbl = connect({ signer, chain: hre.network.name as ChainName });
+        const frm = init(tbl);
+        const res = await frm.tables.processTablesConfig(config);
+        return res;
+      },
+    };
+  });
 });
+
+task("node", async (args, hre, runSuper) => {
+  if (hre.network.name === "local-tableland") {
+    await startLocalTableland(hre.config.localTableland);
+    await new Promise((res) => {});
+  } else {
+    await runSuper(args);
+  }
+});
+
+task("run", async (args, hre, runSuper) => {
+  let lt: LocalTableland | undefined;
+  if (hre.network.name === "local-tableland") {
+    lt = await startLocalTableland(hre.config.localTableland);
+  }
+  await runSuper(args);
+  if (lt) {
+    await lt.shutdown();
+  }
+});
+
+task("test", async (args, hre, runSuper) => {
+  let lt: LocalTableland | undefined;
+  if (hre.network.name === "local-tableland") {
+    lt = await startLocalTableland(hre.config.localTableland);
+  }
+  await runSuper(args);
+  if (lt) {
+    await lt.shutdown();
+  }
+});
+
+task("tables", async (args, hre) => {
+  let lt: LocalTableland | undefined;
+  if (hre.network.name === "local-tableland") {
+    lt = await startLocalTableland(hre.config.localTableland);
+  }
+  await hre.tableland.processTables(hre.config.tables);
+  if (lt) {
+    await lt.shutdown();
+  }
+});
+
+async function startLocalTableland(config?: Config): Promise<LocalTableland> {
+  // TODO: Figure out how to pass hardhat node settings to the local tableland instance.
+  const lt = new LocalTableland(config);
+  process.on("SIGINT", async () => {
+    await lt.shutdown();
+  });
+  await lt.start();
+  return lt;
+}
