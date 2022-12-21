@@ -3,8 +3,8 @@ import { Config, LocalTableland } from "@tableland/local";
 import { extendConfig, extendEnvironment, task } from "hardhat/config";
 import { lazyObject, HardhatPluginError } from "hardhat/plugins";
 import { HardhatConfig, HardhatUserConfig } from "hardhat/types";
-import "@nomicfoundation/hardhat-toolbox";
 import path from "path";
+import "@nomiclabs/hardhat-ethers";
 import { init, TablesConfig } from "./tables";
 import "./type-extensions";
 
@@ -83,16 +83,20 @@ task("test", async (args, hre, runSuper) => {
   }
 });
 
-task("tables", async (args, hre) => {
-  let lt: LocalTableland | undefined;
-  if (hre.network.name === "local-tableland") {
-    lt = await startLocalTableland(hre.config.localTableland);
+task(
+  "tables",
+  "Process Tableland tables defined in your Hardhat config",
+  async (args, hre) => {
+    let lt: LocalTableland | undefined;
+    if (hre.network.name === "local-tableland") {
+      lt = await startLocalTableland(hre.config.localTableland);
+    }
+    await hre.tableland.processTables(hre.config.tables);
+    if (lt) {
+      await lt.shutdown();
+    }
   }
-  await hre.tableland.processTables(hre.config.tables);
-  if (lt) {
-    await lt.shutdown();
-  }
-});
+);
 
 async function startLocalTableland(config?: Config): Promise<LocalTableland> {
   // TODO: Figure out how to pass hardhat node settings to the local tableland instance.
