@@ -6,7 +6,6 @@ import {
   HardhatRuntimeEnvironment,
   HardhatUserConfig,
 } from "hardhat/types";
-import "@nomiclabs/hardhat-ethers";
 import "./type-extensions";
 
 extendConfig(
