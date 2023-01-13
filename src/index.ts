@@ -44,6 +44,7 @@ task("node", async (args, hre, runSuper) => {
 task("run", async (args, hre, runSuper) => {
   if (hre.network.name === "local-tableland") {
     await startLocalTableland(hre);
+    await new Promise(() => {});
   }
   await runSuper(args);
   await hre.localTableland.stop();
@@ -61,9 +62,8 @@ async function startLocalTableland(
   hre: HardhatRuntimeEnvironment
 ): Promise<void> {
   // TODO: Figure out how to pass hardhat node settings to the local tableland instance.
-  const lt = new LocalTableland(hre.config.localTableland);
   process.on("SIGINT", async () => {
     await hre.localTableland.stop();
   });
-  await hre.localTableland.start();
+  await hre.localTableland.start(hre.config.localTableland);
 }
