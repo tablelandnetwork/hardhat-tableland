@@ -9,7 +9,7 @@ This plugin makes it easy to run and interact with a local Tableland node for de
 ## Installation
 
 ```bash
-npm install @tableland/hardhat
+npm install @tableland/hardhat --save-dev
 ```
 
 Import the plugin in your `hardhat.config.js`:
