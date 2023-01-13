@@ -34,7 +34,7 @@
     "@tableland/local": "^0.0.5",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
-    "@types/fs-extra": "^9.0.13",
+    "@types/fs-extra": "^11.0.1",
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.11.17",
     "chai": "^4.3.7",
