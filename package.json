@@ -49,6 +49,7 @@
     "typescript": "^4.9.4"
   },
   "peerDependencies": {
-    "hardhat": "2.x"
+    "hardhat": "2.x",
+    "@tableland/local": "^0.0.5"
   }
 }
