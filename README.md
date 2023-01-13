@@ -81,8 +81,4 @@ These functions allow you to progamatically interact with local Tableland, in a 
 
 There are no additional steps you need to take for this plugin to work. Simply use the `local-tableland` network when running Hardhat tasks or interact with the Hardhat Runtime Environment's `localTableland` API programmatically.
 
-{% note %}
-
-**Note:** The `@nomicfoundation/hardhat-network-helpers` package provides a useful function `loadFixture` that will reset the state of the Hardhat network to a snapshot that your fixture captured. Unfortunately, Local Tablelend can't yet deal with this type of state reset, so avoid using `loadFixture` when using Local Tableland.
-
-{% endnote %}
+**Important Note:** The `@nomicfoundation/hardhat-network-helpers` package provides a useful function `loadFixture` that will reset the state of the Hardhat network to a snapshot that your fixture captured. Unfortunately, Local Tablelend can't yet deal with this type of state reset, so avoid using `loadFixture` when using Local Tableland.
