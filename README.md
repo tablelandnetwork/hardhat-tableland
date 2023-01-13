@@ -24,6 +24,26 @@ Or if you are using TypeScript, in your `hardhat.config.ts`:
 import "@tableland/hardhat";
 ```
 
+## Configuration
+
+This plugin extends the `HardhatUserConfig` object with an optional
+`localTableland` field of type `Config`, which allows you to configure how local Tableland will run.
+
+This is an example of how to set it:
+
+```ts
+const config: HardhatUserConfig = {
+  ...
+  localTableland: {
+    silent: false,
+    verbose: false,
+  },
+  ...
+};
+
+export default config;
+```
+
 ## Tasks
 
 This plugin creates no additional tasks, but does add a new network called `local-tablaland` that can be passed to any task that supports the `--network` flag. For example:
@@ -56,26 +76,6 @@ This plugin extends the Hardhat Runtime Environment by adding a `localTableland`
 ```
 
 These functions allow you to progamatically interact with local Tableland, in a Hardhat script, for example.
-
-## Configuration
-
-This plugin extends the `HardhatUserConfig` object with an optional
-`localTableland` field of type `Config`, which allows you to configure how local Tableland will run.
-
-This is an example of how to set it:
-
-```ts
-const config: HardhatUserConfig = {
-  ...
-  localTableland: {
-    silent: false,
-    verbose: false,
-  },
-  ...
-};
-
-export default config;
-```
 
 ## Usage
 
