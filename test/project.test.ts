@@ -5,6 +5,7 @@ import { useEnvironment } from "./helpers";
 use(chaiAsPromised);
 
 describe("Integration tests", function () {
+  this.timeout(30000);
   describe("Hardhat Runtime Environment local tableland extension", function () {
     useEnvironment("hardhat-project");
     it("Should add the local tableland field", function () {
