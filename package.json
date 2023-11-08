@@ -31,7 +31,7 @@
     "README.md"
   ],
   "devDependencies": {
-    "@tableland/local": "^2.0.2",
+    "@tableland/local": "^2.1.1",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/fs-extra": "^11.0.1",
@@ -39,7 +39,7 @@
     "@types/node": "^20.6.2",
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
-    "hardhat": "^2.17.3",
+    "hardhat": "^2.19.0",
     "mocha": "^10.2.0",
     "prettier": "^2.8.8",
     "ts-node": "^10.9.1",
