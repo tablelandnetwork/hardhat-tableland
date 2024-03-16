@@ -31,7 +31,7 @@
     "README.md"
   ],
   "devDependencies": {
-    "@tableland/local": "^2.2.0",
+    "@tableland/local": "^2.4.1",
     "@types/chai": "^4.3.4",
     "@types/chai-as-promised": "^7.1.5",
     "@types/fs-extra": "^11.0.1",
